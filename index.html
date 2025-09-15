@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Villa Booking | Your Perfect Getaway</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/scrollreveal"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 5rem; 
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d1117;
+            color: #c9d1d9;
+            overflow-x: hidden;
+        }
+        .glass-effect-header {
+            background: rgba(17, 24, 39, 0.6);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .glass-effect {
+            background: rgba(31, 41, 55, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .glass-effect:hover {
+             box-shadow: 0 0 25px rgba(59, 130, 246, 0.2);
+             border-color: rgba(59, 130, 246, 0.3);
+        }
+        .header-glow {
+            text-shadow: 0 0 12px rgba(59, 130, 246, 0.6);
+        }
+        .hero-title-glow {
+            text-shadow: 0 0 20px rgba(59, 130, 246, 0.5), 0 0 40px rgba(59, 130, 246, 0.3);
+        }
+        .section-title {
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+            border-bottom: 2px solid #3B82F6;
+            padding-bottom: 0.5rem;
+        }
+        .nav-link-glow:hover {
+             text-shadow: 0 0 8px rgba(59, 130, 246, 0.8);
+        }
+        #villas, #amenities, #contact {
+            background-color: #111827;
+        }
+        .reveal {
+            visibility: hidden;
+        }
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            filter: invert(0.6) brightness(100%);
+        }
+        .modal-overlay {
+            background: rgba(13, 17, 23, 0.7);
+            backdrop-filter: blur(8px);
+        }
+        #qrcode canvas, #qrcode img {
+            display: block;
+            margin: auto;
+            border-radius: 0.5rem;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Welcome Screen -->
+    <div id="welcome-screen" class="fixed inset-0 bg-gray-900 flex justify-center items-center z-50 transition-opacity duration-1000 ease-in-out">
+        <h1 id="welcome-text" class="text-4xl sm:text-5xl md:text-7xl font-bold text-white text-center hero-title-glow px-4 leading-tight">
+            <!-- Text will be injected by JS -->
+        </h1>
+    </div>
+
+    <!-- Main Content (Initially Hidden) -->
+    <div id="main-content" class="opacity-0 transition-opacity duration-1000">
+        <!-- Custom Cursor -->
+        <div id="custom-cursor" class="hidden lg:block pointer-events-none fixed -translate-x-1/2 -translate-y-1/2 z-50">
+            <div class="w-48 h-48 bg-blue-500/10 rounded-full blur-3xl"></div>
+        </div>
+
+        <!-- Header -->
+        <header class="fixed w-full z-30 glass-effect-header">
+            <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+                <h1 class="text-2xl md:text-3xl font-bold header-glow">VillaLux</h1>
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="#hero" class="text-lg text-gray-300 hover:text-blue-400 transition-colors duration-300 nav-link-glow">Home</a>
+                    <a href="#villas" class="text-lg text-gray-300 hover:text-blue-400 transition-colors duration-300 nav-link-glow">Villas</a>
+                    <a href="#amenities" class="text-lg text-gray-300 hover:text-blue-400 transition-colors duration-300 nav-link-glow">Amenities</a>
+                    <a href="#contact" class="text-lg text-gray-300 hover:text-blue-400 transition-colors duration-300 nav-link-glow">Contact</a>
+                </nav>
+                <button id="mobile-menu-button" class="md:hidden text-3xl text-gray-300">
+                    &#9776;
+                </button>
+            </div>
+            <div id="mobile-menu" class="hidden md:hidden bg-gray-800/90">
+                <a href="#hero" class="block py-3 px-6 text-lg hover:bg-gray-700/80 transition-colors duration-300">Home</a>
+                <a href="#villas" class="block py-3 px-6 text-lg hover:bg-gray-700/80 transition-colors duration-300">Villas</a>
+                <a href="#amenities" class="block py-3 px-6 text-lg hover:bg-gray-700/80 transition-colors duration-300">Amenities</a>
+                <a href="#contact" class="block py-3 px-6 text-lg hover:bg-gray-700/80 transition-colors duration-300">Contact</a>
+            </div>
+        </header>
+
+        <main>
+            <!-- Hero Section -->
+            <section id="hero" class="min-h-screen flex items-center justify-center text-center pt-20 pb-20 bg-cover bg-center" style="background-image: linear-gradient(rgba(13, 17, 23, 0.8), rgba(13, 17, 23, 0.8)), url('https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&q=80&w=1974');">
+                <div class="container mx-auto px-6">
+                    <h2 class="text-4xl sm:text-5xl md:text-7xl font-bold hero-title-glow leading-tight reveal">Find Your Perfect Getaway</h2>
+                    <p class="mt-6 text-lg md:text-xl max-w-4xl mx-auto text-gray-300 leading-relaxed reveal">
+                        Discover and book exclusive luxury villas in the most beautiful destinations around the world.
+                    </p>
+                    <div class="mt-10 max-w-4xl mx-auto glass-effect p-6 rounded-xl reveal">
+                        <form id="search-form" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
+                            <input id="destination-input" type="text" placeholder="Filter by Destination (e.g., Bali)" class="md:col-span-2 w-full p-4 bg-gray-800/50 rounded-lg border-2 border-gray-700 focus:border-blue-500 focus:outline-none transition-colors duration-300"/>
+                            <input id="arrival-date-input" type="date" title="Arrival Date" class="w-full p-4 bg-gray-800/50 rounded-lg border-2 border-gray-700 focus:border-blue-500 focus:outline-none transition-colors duration-300" style="color-scheme: dark;" required/>
+                            <input id="departure-date-input" type="date" title="Departure Date" class="w-full p-4 bg-gray-800/50 rounded-lg border-2 border-gray-700 focus:border-blue-500 focus:outline-none transition-colors duration-300" style="color-scheme: dark;" required/>
+                            <button type="submit" class="w-full bg-blue-600 text-white font-bold py-4 px-6 rounded-lg text-lg hover:bg-blue-700 transition-all duration-300 hover:scale-105">
+                                Filter
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Villas Section -->
+            <section id="villas" class="py-24">
+                <div class="container mx-auto px-6 text-center">
+                    <h3 id="villas-heading" class="text-4xl font-bold text-center mb-20 text-gray-100 section-title relative inline-block">Featured Villas</h3>
+                    <div id="villas-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <!-- Villa cards will be dynamically inserted here from the API -->
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Amenities Section -->
+            <section id="amenities" class="py-24">
+                <div class="container mx-auto px-6 text-center">
+                    <h3 class="text-4xl font-bold text-center mb-20 text-gray-100 section-title relative inline-block reveal">Luxury Amenities</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 max-w-5xl mx-auto">
+                        <div class="reveal"><div class="glass-effect p-6 rounded-xl hover:-translate-y-2 transition-transform duration-300"><div class="text-5xl mb-3">🏊</div><p>Private Pool</p></div></div>
+                        <div class="reveal"><div class="glass-effect p-6 rounded-xl hover:-translate-y-2 transition-transform duration-300"><div class="text-5xl mb-3">📶</div><p>High-Speed WiFi</p></div></div>
+                        <div class="reveal"><div class="glass-effect p-6 rounded-xl hover:-translate-y-2 transition-transform duration-300"><div class="text-5xl mb-3">🍳</div><p>Full Kitchen</p></div></div>
+                        <div class="reveal"><div class="glass-effect p-6 rounded-xl hover:-translate-y-2 transition-transform duration-300"><div class="text-5xl mb-3">🚗</div><p>Free Parking</p></div></div>
+                        <div class="reveal"><div class="glass-effect p-6 rounded-xl hover:-translate-y-2 transition-transform duration-300"><div class="text-5xl mb-3">🌊</div><p>Ocean View</p></div></div>
+                        <div class="reveal"><div class="glass-effect p-6 rounded-xl hover:-translate-y-2 transition-transform duration-300"><div class="text-5xl mb-3">🧑‍🍳</div><p>Private Chef</p></div></div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Contact Section -->
+            <section id="contact" class="py-24">
+                <div class="container mx-auto px-6 text-center">
+                    <h3 class="text-4xl font-bold text-center mb-20 text-gray-100 section-title relative inline-block reveal">Contact Us</h3>
+                    <p class="text-lg max-w-2xl mx-auto mb-10 reveal">Have a question or a special request? Fill out the form below and our team will get back to you shortly.</p>
+                    <form class="max-w-xl mx-auto glass-effect p-8 rounded-xl reveal">
+                        <div class="mb-6"><input type="text" placeholder="Your Name" class="w-full p-4 bg-gray-800/50 rounded-lg border-2 border-gray-700 focus:border-blue-500 focus:outline-none transition-colors duration-300"/></div>
+                        <div class="mb-6"><input type="email" placeholder="Your Email" class="w-full p-4 bg-gray-800/50 rounded-lg border-2 border-gray-700 focus:border-blue-500 focus:outline-none transition-colors duration-300"/></div>
+                        <div class="mb-6"><textarea placeholder="Your Message" rows="5" class="w-full p-4 bg-gray-800/50 rounded-lg border-2 border-gray-700 focus:border-blue-500 focus:outline-none transition-colors duration-300"></textarea></div>
+                        <button type="submit" class="w-full bg-blue-600 text-white font-bold py-4 px-8 rounded-lg text-lg hover:bg-blue-700 transition-colors duration-300">Send Message</button>
+                    </form>
+                </div>
+            </section>
+        </main>
+
+        <!-- Booking Modal -->
+        <div id="booking-modal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+            <div id="booking-modal-content" class="glass-effect p-8 rounded-xl max-w-lg w-full text-left relative transform transition-transform duration-300 scale-95">
+                <button id="close-booking-modal-button" class="absolute top-4 right-4 text-3xl text-gray-400 hover:text-white">&times;</button>
+                <h3 class="text-3xl font-bold mb-2 text-blue-300">Confirm Your Booking</h3>
+                <p id="modal-villa-name" class="text-lg text-gray-300 mb-6"></p>
+                <form id="booking-form">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                        <div><label class="block text-sm font-medium text-gray-400 mb-1">Arrival</label><p id="modal-arrival-date" class="w-full p-3 bg-gray-800/50 rounded-lg border-2 border-gray-700"></p></div>
+                        <div><label class="block text-sm font-medium text-gray-400 mb-1">Departure</label><p id="modal-departure-date" class="w-full p-3 bg-gray-800/50 rounded-lg border-2 border-gray-700"></p></div>
+                    </div>
+                    <div class="mb-4"><label for="full-name" class="block text-sm font-medium text-gray-400 mb-1">Full Name</label><input type="text" id="full-name" class="w-full p-3 bg-gray-800/50 rounded-lg border-2 border-gray-700 focus:border-blue-500 focus:outline-none" required></div>
+                    <div class="mb-4"><label for="email" class="block text-sm font-medium text-gray-400 mb-1">Email</label><input type="email" id="email" class="w-full p-3 bg-gray-800/50 rounded-lg border-2 border-gray-700 focus:border-blue-500 focus:outline-none" required></div>
+                    <div class="mb-4"><label for="guests" class="block text-sm font-medium text-gray-400 mb-1">Number of Guests</label><input type="number" id="guests" min="1" max="10" class="w-full p-3 bg-gray-800/50 rounded-lg border-2 border-gray-700 focus:border-blue-500 focus:outline-none" required></div>
+                    <div class="mb-6"><label for="requests" class="block text-sm font-medium text-gray-400 mb-1">Special Requests (Optional)</label><textarea id="requests" rows="3" class="w-full p-3 bg-gray-800/50 rounded-lg border-2 border-gray-700 focus:border-blue-500 focus:outline-none"></textarea></div>
+                    <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-lg text-lg hover:bg-blue-700 transition-colors">Confirm & Book</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Confirmation Modal -->
+        <div id="confirmation-modal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+            <div id="confirmation-modal-content" class="glass-effect text-center p-8 rounded-xl max-w-md w-full relative transform transition-transform duration-300 scale-95">
+                <button id="close-confirmation-modal-button" class="absolute top-4 right-4 text-3xl text-gray-400 hover:text-white">&times;</button>
+                <h3 class="text-3xl font-bold mb-4 text-blue-300">Booking Confirmed!</h3>
+                <p class="text-gray-300 mb-6">Scan the QR code at check-in. A copy has been sent to your email.</p>
+                <div id="qrcode" class="p-4 bg-gray-700/50 rounded-lg inline-block mb-6 border-2 border-gray-600"></div>
+                <div class="text-left space-y-3">
+                    <p class="text-lg"><span class="font-bold text-gray-400">Confirmation ID:</span> <span id="confirmation-id" class="font-mono text-blue-300"></span></p>
+                    <p class="text-lg"><span class="font-bold text-gray-400">Villa:</span> <span id="confirmation-villa-name"></span></p>
+                    <p class="text-lg"><span class="font-bold text-gray-400">Guest:</span> <span id="confirmation-guest-name"></span></p>
+                    <p class="text-lg"><span class="font-bold text-gray-400">Dates:</span> <span id="confirmation-dates"></span></p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <footer class="bg-gray-900/50 py-8">
+            <div class="container mx-auto px-6 text-center text-gray-400">
+                <p>&copy; 2025 VillaLux. All Rights Reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- CONFIGURATION ---
+            // --- CHANGE: Use a relative path for the API URL ---
+            const API_URL = ''; // This now works for both local and deployed versions
+
+            let currentSearchDates = { arrival: '', departure: '' };
+
+            // --- Set Default Dates & Validation ---
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const formatDate = (date) => date.toISOString().split('T')[0];
+            const arrivalInput = document.getElementById('arrival-date-input');
+            const departureInput = document.getElementById('departure-date-input');
+            const todayString = formatDate(today);
+            const tomorrowString = formatDate(tomorrow);
+
+            arrivalInput.value = todayString;
+            departureInput.value = tomorrowString;
+            arrivalInput.min = todayString;
+            departureInput.min = tomorrowString;
+            currentSearchDates.arrival = todayString;
+            currentSearchDates.departure = tomorrowString;
+
+            arrivalInput.addEventListener('change', () => {
+                currentSearchDates.arrival = arrivalInput.value;
+                const arrivalDate = new Date(arrivalInput.value);
+                const nextDay = new Date(arrivalDate);
+                nextDay.setDate(nextDay.getDate() + 1);
+                const nextDayString = formatDate(nextDay);
+                
+                departureInput.min = nextDayString;
+                if (departureInput.value < nextDayString) {
+                    departureInput.value = nextDayString;
+                }
+                currentSearchDates.departure = departureInput.value;
+            });
+            departureInput.addEventListener('change', () => {
+                currentSearchDates.departure = departureInput.value;
+            });
+
+            // --- Welcome Screen & Animations ---
+            const welcomeText = "Welcome to VillaLux";
+            const welcomeElement = document.getElementById('welcome-text');
+            welcomeText.split('').forEach((char, index) => {
+                const span = document.createElement('span');
+                if(char === ' '){ span.innerHTML = '&nbsp;'; } else { span.textContent = char; }
+                span.style.opacity = '0';
+                span.style.display = 'inline-block';
+                span.style.transform = 'translateY(50px)';
+                span.style.transition = `opacity 0.5s ${index * 0.08}s, transform 0.5s ${index * 0.08}s`;
+                welcomeElement.appendChild(span);
+            });
+            setTimeout(() => {
+                Array.from(welcomeElement.children).forEach(span => {
+                    span.style.opacity = '1';
+                    span.style.transform = 'translateY(0)';
+                });
+            }, 100);
+            setTimeout(() => {
+                const welcomeScreen = document.getElementById('welcome-screen');
+                welcomeScreen.style.opacity = '0';
+                welcomeScreen.style.pointerEvents = 'none';
+                document.getElementById('main-content').style.opacity = '1';
+                const sr = ScrollReveal({
+                    origin: 'bottom', distance: '50px', duration: 800,
+                    delay: 100, easing: 'cubic-bezier(0.5, 0, 0, 1)', viewFactor: 0.2,
+                });
+                sr.reveal('.reveal');
+                sr.reveal('#amenities .reveal', { interval: 100, origin: 'left' });
+            }, 3000);
+
+            // --- Mobile Menu & Cursor ---
+            document.getElementById('mobile-menu-button').addEventListener('click', () => document.getElementById('mobile-menu').classList.toggle('hidden'));
+            document.querySelectorAll('#mobile-menu a').forEach(link => link.addEventListener('click', () => document.getElementById('mobile-menu').classList.add('hidden')));
+            const cursor = document.getElementById('custom-cursor');
+            window.addEventListener('mousemove', e => {
+                cursor.style.left = e.clientX + 'px';
+                cursor.style.top = e.clientY + 'px';
+            });
+
+            // --- Villa Display & Data Fetching Logic ---
+            const villasContainer = document.getElementById('villas-container');
+            const villasHeading = document.getElementById('villas-heading');
+
+            const displayVillas = (villas) => {
+                villasContainer.innerHTML = '';
+                if (villas.length > 0) {
+                    const villasHTML = villas.map(villa => `
+                        <div class="glass-effect rounded-xl flex flex-col text-left group overflow-hidden hover:-translate-y-2">
+                            <img src="${villa.image_url}" alt="${villa.name}" class="w-full h-64 object-cover">
+                            <div class="p-6 flex flex-col flex-grow">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="text-2xl font-bold text-blue-300" data-villa-name="${villa.name}">${villa.name}</h4>
+                                    <span class="text-lg font-semibold bg-gray-700/50 text-yellow-300 rounded-md px-3 py-1">⭐ ${villa.rating}</span>
+                                </div>
+                                <p class="text-gray-400 mb-4">${villa.location}</p>
+                                <div class="mt-auto flex justify-between items-center">
+                                    <p class="text-xl font-semibold text-white"><span class="text-2xl">$${villa.price_per_night}</span> / night</p>
+                                    <button class="book-now-button bg-blue-600 text-white font-semibold py-2 px-5 rounded-lg hover:bg-blue-700 transition-colors duration-300">Book Now</button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                    villasContainer.innerHTML = villasHTML;
+                } else {
+                    villasContainer.innerHTML = `<p class="text-lg text-gray-400 md:col-span-3">We couldn't find any available villas for your search. Please try a different destination.</p>`;
+                }
+            };
+
+            const fetchAndDisplayVillas = async (location = '') => {
+                try {
+                    let url = `${API_URL}/api/villas`;
+                    if (location) {
+                        url += `?location=${encodeURIComponent(location)}`;
+                    }
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    const villas = await response.json();
+                    
+                    if (!location) {
+                        // On initial load, only show 5 as "featured"
+                        displayVillas(villas.slice(0, 5));
+                    } else {
+                        displayVillas(villas);
+                    }
+                } catch (error) {
+                    console.error('Failed to fetch villas:', error);
+                    villasContainer.innerHTML = `<p class="text-lg text-red-400 md:col-span-3 text-center"><strong>Error: Could not connect to the server.</strong><br>Please make sure the backend server (server.js) is running and then refresh the page.</p>`;
+                }
+            };
+            
+            // Fetch and display default featured villas on initial page load
+            fetchAndDisplayVillas();
+
+            // --- Search/Filter Logic ---
+            document.getElementById('search-form').addEventListener('submit', (event) => {
+                event.preventDefault();
+                const destination = document.getElementById('destination-input').value.trim().toLowerCase();
+                
+                if (!destination) {
+                    villasHeading.textContent = `Featured Villas`;
+                } else {
+                    villasHeading.textContent = `Available Villas in ${destination.charAt(0).toUpperCase() + destination.slice(1)}`;
+                }
+                
+                fetchAndDisplayVillas(destination);
+                document.getElementById('villas').scrollIntoView({ behavior: 'smooth' });
+            });
+
+            // --- Modal Logic ---
+            const bookingModal = document.getElementById('booking-modal');
+            const bookingModalContent = document.getElementById('booking-modal-content');
+            const closeModalButton = document.getElementById('close-booking-modal-button');
+            const modalVillaName = document.getElementById('modal-villa-name');
+            const modalArrivalDate = document.getElementById('modal-arrival-date');
+            const modalDepartureDate = document.getElementById('modal-departure-date');
+            
+            const confirmationModal = document.getElementById('confirmation-modal');
+            const confirmationModalContent = document.getElementById('confirmation-modal-content');
+            const closeConfirmationModalButton = document.getElementById('close-confirmation-modal-button');
+
+            villasContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('book-now-button')) {
+                    const villaCard = e.target.closest('.glass-effect');
+                    const villaName = villaCard.querySelector('[data-villa-name]').dataset.villaName;
+                    modalVillaName.textContent = `For ${villaName}`;
+                    modalArrivalDate.textContent = currentSearchDates.arrival;
+                    modalDepartureDate.textContent = currentSearchDates.departure;
+                    bookingModal.classList.remove('hidden');
+                    setTimeout(() => bookingModalContent.classList.remove('scale-95'), 10);
+                }
+            });
+
+            const closeBookingModal = () => {
+                bookingModalContent.classList.add('scale-95');
+                setTimeout(() => bookingModal.classList.add('hidden'), 300);
+            };
+            const closeConfirmationModal = () => {
+                confirmationModalContent.classList.add('scale-95');
+                setTimeout(() => confirmationModal.classList.add('hidden'), 300);
+            };
+            closeModalButton.addEventListener('click', closeBookingModal);
+            bookingModal.addEventListener('click', (e) => { if (e.target === bookingModal) closeBookingModal(); });
+            closeConfirmationModalButton.addEventListener('click', closeConfirmationModal);
+            confirmationModal.addEventListener('click', (e) => { if (e.target === confirmationModal) closeConfirmationModal(); });
+
+            document.getElementById('booking-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const generateBookingId = (length = 8) => {
+                    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                    let result = '';
+                    for (let i = 0; i < length; i++) { result += chars.charAt(Math.floor(Math.random() * chars.length)); }
+                    return result;
+                };
+                
+                const bookingDetails = {
+                    bookingId: generateBookingId(),
+                    villa: modalVillaName.textContent.replace('For ', ''),
+                    arrivalDate: modalArrivalDate.textContent,
+                    departureDate: modalDepartureDate.textContent,
+                    fullName: document.getElementById('full-name').value,
+                    email: document.getElementById('email').value,
+                    guests: document.getElementById('guests').value,
+                    requests: document.getElementById('requests').value,
+                };
+                
+                // Send booking data to the backend server
+                try {
+                    const response = await fetch(`${API_URL}/api/bookings`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(bookingDetails)
+                    });
+                    if (!response.ok) {
+                        throw new Error('Booking failed on the server.');
+                    }
+                    const result = await response.json();
+                    console.log('Booking successful:', result);
+
+                    // Show confirmation modal
+                    const qrCodeData = JSON.stringify({
+                        bookingId: bookingDetails.bookingId, name: bookingDetails.fullName, villa: bookingDetails.villa,
+                        arrival: bookingDetails.arrivalDate, departure: bookingDetails.departureDate, guests: bookingDetails.guests
+                    });
+                    const qrcodeContainer = document.getElementById('qrcode');
+                    qrcodeContainer.innerHTML = '';
+                    new QRCode(qrcodeContainer, {
+                        text: qrCodeData, width: 200, height: 200,
+                        colorDark: "#c9d1d9", colorLight: "rgba(31, 41, 55, 0.1)",
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+
+                    document.getElementById('confirmation-id').textContent = bookingDetails.bookingId;
+                    document.getElementById('confirmation-villa-name').textContent = bookingDetails.villa;
+                    document.getElementById('confirmation-guest-name').textContent = bookingDetails.fullName;
+                    document.getElementById('confirmation-dates').textContent = `${bookingDetails.arrivalDate} to ${bookingDetails.departureDate}`;
+                    
+                    closeBookingModal();
+                    e.target.reset(); 
+                    confirmationModal.classList.remove('hidden');
+                    setTimeout(() => confirmationModalContent.classList.remove('scale-95'), 10);
+
+                } catch (error) {
+                    console.error('Failed to submit booking:', error);
+                    alert('There was an error submitting your booking. Please try again.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
