@@ -8,7 +8,7 @@ const path = require('path');
 
 // Initialize the Express app
 const app = express();
-// --- CHANGE 1: Use environment variable for PORT, fallback to 3000 for local dev ---
+// Use environment variable for PORT, fallback to 3000 for local dev
 const PORT = process.env.PORT || 3000;
 
 // Middleware setup
@@ -124,10 +124,6 @@ app.get('/api/villas', (req, res) => {
 app.post('/api/bookings', (req, res) => {
     const { bookingId, villa, arrivalDate, departureDate, fullName, email, guests, requests } = req.body;
 
-    // We need to handle this in steps:
-    // 1. Find the villa_id for the booked villa name.
-    // 2. Find customer_id for the email, or create a new customer.
-    // 3. Insert the booking.
     db.serialize(() => {
         let villaId;
         let customerId;
@@ -168,12 +164,13 @@ app.post('/api/bookings', (req, res) => {
     });
 });
 
-// --- CHANGE 2: Serve the Frontend ---
+// --- Serve the Frontend ---
 // This tells Express to serve all static files in the current directory
 app.use(express.static(__dirname));
 
-// A catch-all route to send index.html for any request that doesn't match an API route
-app.get('*', (req, res) => {
+// --- FIX FOR DEPLOYMENT ---
+// A route for the root path to send index.html
+app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
@@ -182,4 +179,18 @@ app.get('*', (req, res) => {
 app.listen(PORT, () => {
     console.log(`VillaLux server with SQLite listening at http://localhost:${PORT}`);
 });
+```
+
+### Summary of the Change
+
+The only modification is at the very end of the file.
+
+* **Removed:**
+    ```javascript
+    app.get('*', (req, res) => { ... });
+    ```
+* **Added:**
+    ```javascript
+    app.get('/', (req, res) => { ... });
+    
 
