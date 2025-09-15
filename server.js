@@ -12,29 +12,26 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware setup
-app.use(cors()); // Allows cross-origin requests (from your index.html)
+app.use(cors()); // Allows cross-origin requests
 app.use(express.json()); // Parses incoming JSON requests
 
 // Define the path for the database file
 const dbPath = path.join(__dirname, 'villalux.db');
 
 // Connect to the SQLite database.
-// The file 'villalux.db' will be created if it doesn't exist.
 const db = new sqlite3.Database(dbPath, (err) => {
     if (err) {
         console.error("Error connecting to the database:", err.message);
     } else {
         console.log("Successfully connected to the SQLite database 'villalux.db'.");
-        // Function to set up the database schema and initial data
         setupDatabase();
     }
 });
 
 // --- Database Setup Function ---
 function setupDatabase() {
-    // Use serialize to ensure statements run in order
     db.serialize(() => {
-        // Create the villas table if it doesn't exist
+        // Create the villas table
         db.run(`CREATE TABLE IF NOT EXISTS villas (
             villa_id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
@@ -128,29 +125,26 @@ app.post('/api/bookings', (req, res) => {
         let villaId;
         let customerId;
 
-        // 1. Get villa_id
         db.get("SELECT villa_id FROM villas WHERE name = ?", [villa], (err, row) => {
             if (err || !row) {
                 return res.status(400).json({ "error": "Villa not found." });
             }
             villaId = row.villa_id;
 
-            // 2. Get or create customer
             db.get("SELECT customer_id FROM customers WHERE email = ?", [email], (err, row) => {
-                if (row) { // Customer exists
+                if (row) { 
                     customerId = row.customer_id;
                     insertBooking();
-                } else { // Create new customer
+                } else { 
                     db.run("INSERT INTO customers (full_name, email) VALUES (?, ?)", [fullName, email], function(err) {
                         if (err) return res.status(500).json({ "error": err.message });
-                        customerId = this.lastID; // Get the ID of the new customer
+                        customerId = this.lastID;
                         insertBooking();
                     });
                 }
             });
         });
 
-        // 3. Function to insert the final booking record
         function insertBooking() {
             const sql = `INSERT INTO bookings (booking_confirmation_id, customer_id, villa_id, arrival_date, departure_date, guests, special_requests) VALUES (?, ?, ?, ?, ?, ?, ?)`;
             const params = [bookingId, customerId, villaId, arrivalDate, departureDate, guests, requests];
@@ -168,12 +162,10 @@ app.post('/api/bookings', (req, res) => {
 // This tells Express to serve all static files in the current directory
 app.use(express.static(__dirname));
 
-// --- FIX FOR DEPLOYMENT ---
 // A route for the root path to send index.html
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
-
 
 // Start the server
 app.listen(PORT, () => {
@@ -181,16 +173,16 @@ app.listen(PORT, () => {
 });
 ```
 
-### Summary of the Change
+### Next Steps
 
-The only modification is at the very end of the file.
+Now, just repeat the final deployment steps:
 
-* **Removed:**
-    ```javascript
-    app.get('*', (req, res) => { ... });
-    ```
-* **Added:**
-    ```javascript
-    app.get('/', (req, res) => { ... });
+1.  **Save** the corrected `server.js` file.
+2.  Go to your **terminal**.
+3.  Run the commands to push the fix to GitHub:
+    ```bash
+    git add .
+    git commit -m "Fix: Remove markdown from server.js"
+    git push
     
 
