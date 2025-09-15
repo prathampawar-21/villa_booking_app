@@ -171,18 +171,4 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
     console.log(`VillaLux server with SQLite listening at http://localhost:${PORT}`);
 });
-```
-
-### Next Steps
-
-Now, just repeat the final deployment steps:
-
-1.  **Save** the corrected `server.js` file.
-2.  Go to your **terminal**.
-3.  Run the commands to push the fix to GitHub:
-    ```bash
-    git add .
-    git commit -m "Fix: Remove markdown from server.js"
-    git push
-    
 
